@@ -6,48 +6,35 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <ImageView
-        android:id="@+id/image"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
+    <Button
+        android:id="@+id/package_btn"
+        android:layout_width="198dp"
+        android:layout_height="65dp"
         android:layout_marginTop="50dp"
+        android:onClick="openPackageActivity"
+        android:text="Scan Package"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/predictBtn"
-        tools:srcCompat="@tools:sample/avatars" />
+        app:layout_constraintTop_toBottomOf="@+id/pill_btn" />
+
+    <ImageView
+        android:id="@+id/logo_img"
+        android:layout_width="287dp"
+        android:layout_height="254dp"
+        android:layout_marginTop="60dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/ic_launcher" />
 
     <Button
-        android:id="@+id/selectBtn"
-        android:layout_width="200dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="52dp"
-        android:onClick="select"
-        android:text="Select from Gallery"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/predictBtn"
-        android:layout_width="200dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="30dp"
-        android:onClick="predict"
-        android:text="Show prediction"
+        android:id="@+id/pill_btn"
+        android:layout_width="198dp"
+        android:layout_height="65dp"
+        android:layout_marginTop="50dp"
+        android:onClick="openPillActivity"
+        android:text="Scan Pill"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cameraBtn" />
-
-    <Button
-        android:id="@+id/cameraBtn"
-        android:layout_width="200dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="30dp"
-        android:onClick="captureImage"
-        android:text="Take new picture"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/selectBtn" />
+        app:layout_constraintTop_toBottomOf="@+id/logo_img" />
 </androidx.constraintlayout.widget.ConstraintLayout>

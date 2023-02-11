@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 
 public class prediction extends AppCompatActivity {
 
@@ -12,8 +14,8 @@ public class prediction extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_prediction);
 
-        predTxt = findViewById(R.id.pred_txt);
-        accTxt = findViewById(R.id.acc_txt);
+        TextView predTxt = findViewById(R.id.pred_txt);
+        TextView accTxt = findViewById(R.id.acc_txt);
 //        link = findViewById(R.id.link);
 
 //        link.setMovementMethod(LinkMovementMethod.getInstance());
