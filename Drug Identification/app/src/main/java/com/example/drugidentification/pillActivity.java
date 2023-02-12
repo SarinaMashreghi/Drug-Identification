@@ -36,8 +36,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
 
 import org.apache.http.params.HttpParams;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -157,15 +160,24 @@ public class pillActivity extends AppCompatActivity {
                 final String base64img = Base64.encodeToString(bytes, Base64.DEFAULT);
 
                 RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-                String url ="http://172.30.48.1/upload";
+                String url ="https://8ee5-174-93-236-22.ngrok.io/upload";
 
                 StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
+                                JSONObject object = null;
+                                System.out.println(response);
+                                try {
+                                    object = new JSONObject(response);
+                                    System.out.println(object.getJSONArray("data").toString());
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
                                 if(response.equals("success")){
                                     Toast.makeText(getApplicationContext(), "Upload successful", Toast.LENGTH_SHORT).show();
-                                } else Toast.makeText(getApplicationContext(), "Upload fialed", Toast.LENGTH_SHORT).show();
+                                } else Toast.makeText(getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
                             }
                         }, new Response.ErrorListener() {
                     @Override
@@ -175,7 +187,11 @@ public class pillActivity extends AppCompatActivity {
                 }){
                     protected Map<String, String> getParams(){
                         Map<String, String> paramV = new HashMap<>();
-                        paramV.put("image", base64img);
+                        paramV.put("data", base64img);
+//                        JSONObject json = new JSONObject(paramV);
+                        Gson gson = new Gson();
+//                        JSONObject json = gson.toJson(paramV);
+                        System.out.println("sending request");
                         return paramV;
                     }
                 };

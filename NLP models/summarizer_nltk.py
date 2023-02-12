@@ -19,7 +19,7 @@ def read_file(file_name):
 
 def read_string(str_data):
     all_words = [w for w in str_data.split()]
-    # print(all_words)
+    print(all_words)
     sentences = []
 
     i = 0
