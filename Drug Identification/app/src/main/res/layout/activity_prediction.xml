@@ -23,15 +23,26 @@
         android:id="@+id/acc_txt"
         android:layout_width="294dp"
         android:layout_height="65dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="50dp"
         android:text="TextView"
         android:textAlignment="center"
         android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.418"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pred_txt"
-        app:layout_constraintVertical_bias="0.28" />
+        app:layout_constraintTop_toBottomOf="@+id/pred_txt" />
+
+    <Button
+        android:id="@+id/info_btn"
+        android:layout_width="161dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="50dp"
+        android:onClick="getInfo"
+        android:text="Get More Info"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/acc_txt" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -41,6 +41,7 @@ import com.google.gson.Gson;
 import org.apache.http.params.HttpParams;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -55,11 +56,13 @@ public class pillActivity extends AppCompatActivity {
     Button select;
     Bitmap bitmap;
     ImageView img;
-    //    TextView txt;
-    ArrayList<String> labels;
     Uri selectedImage;
     Uri image_uri;
     final int PERMISSION_CODE = 1000;
+    String rootURL = "https://bd2e-174-93-236-22.ngrok.io";
+    String func ="uploadPill";
+    String url = rootURL + "/" + func;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,19 +71,6 @@ public class pillActivity extends AppCompatActivity {
 
         select = findViewById(R.id.selectBtn);
         img = findViewById(R.id.image);
-//        txt = findViewById(R.id.textView);
-
-        labels = new ArrayList<>();
-        for (int ascii=65; ascii<=90; ascii++){
-            labels.add(String.valueOf((char)ascii));
-        }
-        labels.add(4, "del");
-        labels.add(15, "nothing");
-        labels.add(21, "space");
-
-        System.out.println("labels: ");
-        System.out.println(labels);
-
 
 
         selectedImage = getIntent().getParcelableExtra("image_uri");
@@ -160,37 +150,48 @@ public class pillActivity extends AppCompatActivity {
                 final String base64img = Base64.encodeToString(bytes, Base64.DEFAULT);
 
                 RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-                String url ="https://8ee5-174-93-236-22.ngrok.io/upload";
 
                 StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
-                                JSONObject object = null;
+                                JSONObject object;
                                 System.out.println(response);
                                 try {
                                     object = new JSONObject(response);
-                                    System.out.println(object.getJSONArray("data").toString());
+                                    String class_name = object.getString("class");
+                                    String prob = object.getString("probability");
+                                    System.out.println(class_name);
+                                    System.out.println(prob);
+
+                                    if(class_name.equals("0")){
+                                        Toast.makeText(getApplicationContext(), "Sorry, can't identify the pill, try again.", Toast.LENGTH_SHORT).show();
+                                    }else{
+                                        Intent i = new Intent(getApplicationContext(), prediction.class);
+                                        Bundle b = new Bundle();
+                                        b.putString("class", "The pill is "+class_name);
+                                        b.putString("prob", prob);
+                                        i.putExtras(b);
+                                        startActivity(i);
+                                    }
+
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
 
-                                if(response.equals("success")){
-                                    Toast.makeText(getApplicationContext(), "Upload successful", Toast.LENGTH_SHORT).show();
-                                } else Toast.makeText(getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
+//                                if(response.equals("success")){
+//                                    Toast.makeText(getApplicationContext(), "Upload successful", Toast.LENGTH_SHORT).show();
+//                                } else Toast.makeText(getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
                             }
                         }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_LONG).show();
                     }
                 }){
                     protected Map<String, String> getParams(){
                         Map<String, String> paramV = new HashMap<>();
                         paramV.put("data", base64img);
-//                        JSONObject json = new JSONObject(paramV);
-                        Gson gson = new Gson();
-//                        JSONObject json = gson.toJson(paramV);
                         System.out.println("sending request");
                         return paramV;
                     }

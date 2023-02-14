@@ -22,23 +22,41 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class packageActivity extends AppCompatActivity {
 
     Button select;
     Bitmap bitmap;
     ImageView img;
-    //    TextView txt;
-    ArrayList<String> labels;
     Uri selectedImage;
     Uri image_uri;
     final int PERMISSION_CODE = 1000;
+    String rootURL = "https://797e-174-93-236-22.ngrok.io ";
+    String func ="uploadPack";
+    String url = rootURL + "/" + func;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,18 +65,7 @@ public class packageActivity extends AppCompatActivity {
 
         select = findViewById(R.id.selectBtn);
         img = findViewById(R.id.image);
-//        txt = findViewById(R.id.textView);
 
-        labels = new ArrayList<>();
-        for (int ascii=65; ascii<=90; ascii++){
-            labels.add(String.valueOf((char)ascii));
-        }
-        labels.add(4, "del");
-        labels.add(15, "nothing");
-        labels.add(21, "space");
-
-        System.out.println("labels: ");
-        System.out.println(labels);
 
 
 
@@ -101,13 +108,6 @@ public class packageActivity extends AppCompatActivity {
                         cropper.putExtra("data", selectedImage.toString());
                         startActivityForResult(cropper, 101);
 
-//                        setImage(selectedImage);
-//                        try {
-//                            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-
                     }
                 }
             });
@@ -127,113 +127,80 @@ public class packageActivity extends AppCompatActivity {
 
     }
 
-    public Bitmap toGrayscale(Bitmap bmpOriginal)
-    {
-        int width, height;
-        height = bmpOriginal.getHeight();
-        width = bmpOriginal.getWidth();
 
-        Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(bmpGrayscale);
-        Paint paint = new Paint();
-        ColorMatrix cm = new ColorMatrix();
-        cm.setSaturation(0);
-        ColorMatrixColorFilter f = new ColorMatrixColorFilter(cm);
-        paint.setColorFilter(f);
-        c.drawBitmap(bmpOriginal, 0, 0, paint);
-        return bmpGrayscale;
-    }
-
-//    public void predict(View v){
-//            try {
-//                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//            Bitmap resized = Bitmap.createScaledBitmap(bitmap, 224, 224, true);
-//        Bitmap gray_resized = toGrayscale(resized);
-
-//        TensorImage tbuffer = TensorImage.createFrom(TensorImage.fromBitmap(resized), Element.DataType.FLOAT32);
-//        tbuffer = TensorImage.fromBitmap(resized);
-
-//            ByteBuffer byteBuffer = tbuffer.getBuffer();
-
-//        try {
-//            CnnAslMnist1 model = CnnAslMnist1.newInstance(this);
-//
-//            // Creates inputs for reference.
-//            TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 28, 28, 1}, DataType.FLOAT32);
-//            inputFeature0.loadBuffer(byteBuffer);
-//
-//            // Runs model inference and gets result.
-////            CnnAslMnist1.Outputs outputs = model.process(inputFeature0);
-//        try {
-//            LiteModelAmericanSignLanguage1 model = LiteModelAmericanSignLanguage1.newInstance(this);
-//
-//            // Creates inputs for reference.
-//            TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 224, 224, 3}, DataType.FLOAT32);
-//            inputFeature0.loadBuffer(byteBuffer);
-//
-//            // Runs model inference and gets result.
-//            LiteModelAmericanSignLanguage1.Outputs outputs = model.process(inputFeature0);
-//
-//            float[] outputFeature0 = outputs.getOutputFeature0AsTensorBuffer().getFloatArray();
-//
-//            int maxInd = getMaxInd(outputFeature0);
-////            txt.setText(labels.get(maxInd)+ outputFeature0[maxInd]);     old version
-//
-//            Intent i = new Intent(this, prediction.class);
-//
-//            Bundle b = new Bundle();
-//
-//            System.out.println("last layer");
-//            System.out.println(outputFeature0);
-//
-//            b.putString("prediction", labels.get(maxInd));
-//            b.putFloat("accuracy", outputFeature0[maxInd]);
-//            i.putExtras(b);
-//            startActivity(i);
-//
-//            model.close();
-//        } catch (IOException e) {
-//            // TODO Handle the exception
-//        }
-//
-//    }
-
-    public int getMaxInd ( float[] arr){
-        float max = arr[0];
-        int ind = 0;
-
-        for (int i = 1; i < arr.length; i++) {
-            if (arr[i] > max) {
-                max = arr[i];
-                ind = i;
+    public void predict(View v){
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        }
 
-        return ind;
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        Bitmap resized = Bitmap.createScaledBitmap(bitmap, 224, 224, true);
+
+        if(resized != null){
+
+            resized.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            byte[] bytes = byteArrayOutputStream.toByteArray();
+
+            final String base64img = Base64.encodeToString(bytes, Base64.DEFAULT);
+
+            RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            JSONObject object;
+                            System.out.println(response);
+                            try {
+                                object = new JSONObject(response);
+                                String class_name = object.getString("class");
+                                String prob = object.getString("probability");
+                                System.out.println(class_name);
+                                System.out.println(prob);
+
+                                if(class_name.equals("0")){
+                                    Toast.makeText(getApplicationContext(), "Sorry, can't identify the packaging, try again.", Toast.LENGTH_SHORT).show();
+                                }else{
+                                    Intent i = new Intent(getApplicationContext(), prediction.class);
+                                    Bundle b = new Bundle();
+                                    b.putString("class", "The medication is "+class_name);
+                                    b.putString("prob", prob);
+                                    i.putExtras(b);
+                                    startActivity(i);
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+//                            if(response.equals("success")){
+//                                Toast.makeText(getApplicationContext(), "Upload successful", Toast.LENGTH_SHORT).show();
+//                            } else Toast.makeText(getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_LONG).show();
+                }
+            }){
+                protected Map<String, String> getParams(){
+                    Map<String, String> paramV = new HashMap<>();
+                    paramV.put("data", base64img);
+                    System.out.println("sending request");
+                    return paramV;
+                }
+            };
+            queue.add(stringRequest);
+
+        }
+        else{
+            Toast.makeText(getApplicationContext(), "Upload a picture", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void captureImage (View v){
-
-//        Intent i = new Intent(this, Camera.class);
-//        startActivity(i);
-
-//        ImageButton captureBtn;
-//        ImageView image;
-//        Uri image_uri;
-//        Bitmap bitmap;
-
-//        @Override
-//        protected void onCreate(Bundle savedInstanceState) {
-//            super.onCreate(savedInstanceState);
-//            setContentView(R.layout.activity_camera);
-//
-//            image = findViewById(R.id.imgView);
-//            captureBtn = findViewById(R.id.captureBtn);
-//        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(android.Manifest.permission.CAMERA) ==
