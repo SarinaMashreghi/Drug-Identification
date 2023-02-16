@@ -4,37 +4,76 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/c1"
     tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/search_brand"
+        android:layout_width="198dp"
+        android:layout_height="65dp"
+        android:layout_marginTop="20dp"
+        android:onClick="openPackageActivity"
+        android:text="Search by branf name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_image" />
+
+    <Button
+        android:id="@+id/text_image"
+        android:layout_width="198dp"
+        android:layout_height="65dp"
+        android:layout_marginTop="20dp"
+        android:onClick="openPackageActivity"
+        android:text="Scan Text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/package_btn" />
 
     <Button
         android:id="@+id/package_btn"
         android:layout_width="198dp"
         android:layout_height="65dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="20dp"
         android:onClick="openPackageActivity"
         android:text="Scan Package"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pill_btn" />
 
     <ImageView
         android:id="@+id/logo_img"
-        android:layout_width="287dp"
-        android:layout_height="254dp"
-        android:layout_marginTop="60dp"
+        android:layout_width="254dp"
+        android:layout_height="207dp"
+        android:layout_marginTop="40dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/ic_launcher" />
+        app:srcCompat="@mipmap/logo" />
 
     <Button
         android:id="@+id/pill_btn"
         android:layout_width="198dp"
-        android:layout_height="65dp"
-        android:layout_marginTop="50dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="40dp"
         android:onClick="openPillActivity"
         android:text="Scan Pill"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/logo_img" />
+
+    <EditText
+        android:id="@+id/editTextTextPersonName2"
+        android:layout_width="199dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Brand name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_brand" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

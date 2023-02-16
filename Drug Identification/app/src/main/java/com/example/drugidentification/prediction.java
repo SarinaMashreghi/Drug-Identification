@@ -79,11 +79,18 @@ public class prediction extends AppCompatActivity {
 //                                i.putExtras(b);
 //                                startActivity(i);
 //                            }
-                            Intent i = new Intent(getApplicationContext(), prediction.class);
-                            Bundle b = new Bundle();
-                            b.putString("info", "Information about "+prediction+":\n"+info);
-                            i.putExtras(b);
-                            startActivity(i);
+
+                            if(info!=null){
+                                Intent i = new Intent(getApplicationContext(), prediction.class);
+                                Bundle b = new Bundle()
+                                b.putString("info", "Information about "+prediction+":\n"+info);
+                                i.putExtras(b);
+                                startActivity(i);}
+                            else{
+                                Intent i = new Intent(getApplicationContext(), error.class);
+
+                                startActivity(i);
+                            }
 
 
                         } catch (JSONException e) {
