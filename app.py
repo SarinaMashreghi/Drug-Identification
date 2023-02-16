@@ -2,14 +2,14 @@ import os
 from flask import Flask, request, jsonify
 import numpy as np
 import base64
+import pandas as pd
 from io import BytesIO
 from PIL import Image
 import tensorflow as tf
 import tensorflow_hub as hub
-from api_call import getInfo, getUsage, getDescription, getPrecautions, getWarnings
+from api_call import *
 from OCR import extract_text
-from NLP_models.summarizer_nltk import generate_file_summary, generate_string_summary
-from NLP_models.summarizer_functions import gpt_summarizer, bert_extractive, xlnet_summarizer
+from medical_NER import getEntities
 
 pill_model = tf.keras.models.load_model("CV models/pills_efficientNetB0.h5")
 pack_model = tf.keras.models.load_model("CV models/pack_efficientnet_model_1.h5",
@@ -18,6 +18,8 @@ pack_model = tf.keras.models.load_model("CV models/pack_efficientnet_model_1.h5"
 pill_classes = ['Alaxan', 'Bactidol', 'Bioflu', 'Biogesic', 'DayZinc', 'Decolgen', 'Fish Oil', 'Kremil S', 'Medicol',
                 'Neozep']
 pack_classes = os.listdir(r"C:\Users\sarin\Documents\Science Fair Data\packaging_images")
+med_cond_df = pd.read_csv("medical_condition_urls.csv")
+med_conds = list(med_cond_df["medical_condition"])
 
 app = Flask(__name__)
 
@@ -72,6 +74,7 @@ def uploadPack():
     return jsonify({"class": class_name,
                     "probability": str(prob) + '%'})
 
+
 @app.route('/extractText', methods=['POST'])
 def extractText():
     img_string = request.form.get("data")
@@ -80,14 +83,53 @@ def extractText():
     img = Image.open(BytesIO(img))
 
     text = extract_text(img)
-    summary = bert_extractive(text, 5)
+    # summary = bert_extractive(text, 5)
 
-    return jsonify({"sum_text": summary})
+    med_ner = getEntities(text, "custom")
+    products, quantity = getEntities(text, "roberta")
+    conds = []
+    cond_in_df = []
+    for i, j in med_ner:
+        if j == "MEDICALCONDITION":
+            conds.append(i)
+            if i in med_conds:
+                cond_in_df.append(i)
+        if j == "MEDICINE":
+            products.append(i)
+
+    cond_str = "Medical Conditions: \n"
+    for i in conds:
+        cond_str += i + "\n"
+
+    final_api_summary = ''
+    for p in products:
+        final_api_summary = getSummary(p, 2)
+        if final_api_summary != '':
+            break
+
+    if len(quantity) == 0 and final_api_summary != '':
+        products_2, quantity = getEntities(text, "roberta")
+
+    quan = ''
+    if len(quantity) != 0:
+        quan += "Quantity: " + quantity[0] + "\n\n"
+
+    final_str = cond_str + quan + final_api_summary
+
+    # get medical condition urls
+    urls = []
+    for i in cond_in_df:
+        urls.append(med_cond_df.loc[med_cond_df["medical_condition"] == i]["url"])
+
+    return jsonify({"sum_text": final_str,
+                    "urls": urls})
+
 
 @app.route('/getInfo', methods=['POST'])
 def getInfo():
     drug_brand = request.form.get("name")
     return jsonify({"info": getInfo(drug_brand)})
+
 
 def getClass(class_names, pred_arr, conf_tresh=0):
     prob = max(pred_arr)

@@ -1,6 +1,8 @@
 import os
 import requests
-from api_call import getDescription
+
+import medical_NER
+# from api_call import getDescription
 
 # good_brands = []
 #
@@ -21,15 +23,41 @@ from api_call import getDescription
 # from gensim.summarization.summarizer import summarize
 # from gensim.summarization import keywords
 
-from summarizer import Summarizer, TransformerSummarizer
-
-text1 = getDescription("tylenol")
+# from summarizer import Summarizer, TransformerSummarizer
 #
-# model = Summarizer()
-# result = model(text1, num_sentences=3, min_length=60)
-# full = ''.join(result)
+# text1 = getDescription("tylenol")
+# #
+# # model = Summarizer()
+# # result = model(text1, num_sentences=3, min_length=60)
+# # full = ''.join(result)
+#
+# GPT2_model = TransformerSummarizer(transformer_type="GPT2", transformer_model_key="gpt2-medium")
+# full = ''.join(GPT2_model(text1, min_length=60))
+# print(full)
+# print(text1)
+from medical_NER import getEntities
 
-GPT2_model = TransformerSummarizer(transformer_type="GPT2", transformer_model_key="gpt2-medium")
-full = ''.join(GPT2_model(text1, min_length=60))
-print(full)
-print(text1)
+text = "While bismuth compounds (Pepto-Bismol) decreased the number of bowel movements in those with travelers' diarrhea, they do not decrease the length of illness.[91] Anti-motility agents like loperamide are also effective at reducing the number of stools but not the duration of disease.[8] These agents should be used only if bloody diarrhea is not present."
+
+#
+
+#make new df
+
+import pandas as pd
+from nltk.tokenize import word_tokenize
+import nltk
+nltk.download('punkt')
+
+df = pd.read_csv("drugs_side_effects_drugs_com.csv")
+med_cond_1 = list(df["medical_condition"])
+med_cond =[]
+for i in med_cond_1:
+    name = word_tokenize(i)
+    med_cond.append(name[0].lower())
+url = list(df["medical_condition_url"])
+
+new_df = pd.DataFrame(list(zip(med_cond, url)))
+new_df.columns=["medical_condition", "url"]
+new_df = new_df.drop_duplicates().reset_index(drop=True)
+new_df.to_csv("medical_condition_urls.csv")
+print(new_df)

@@ -34,4 +34,4 @@ myconfig = r"--psm 12 --oem 3"
 
 def extract_text(image):
     text = pytesseract.image_to_string(image, config=myconfig)
-    return text
+    return text.lower()
