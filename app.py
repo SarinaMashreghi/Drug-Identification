@@ -1,17 +1,15 @@
-import base64
 import os
-
-import pandas as pd
 from flask import Flask, request, jsonify
 import numpy as np
 import base64
-import pickle
-import matplotlib.pyplot as plt
 from io import BytesIO
 from PIL import Image
 import tensorflow as tf
 import tensorflow_hub as hub
 from api_call import getInfo, getUsage, getDescription, getPrecautions, getWarnings
+from OCR import extract_text
+from NLP_models.summarizer_nltk import generate_file_summary, generate_string_summary
+from NLP_models.summarizer_functions import gpt_summarizer, bert_extractive, xlnet_summarizer
 
 pill_model = tf.keras.models.load_model("CV models/pills_efficientNetB0.h5")
 pack_model = tf.keras.models.load_model("CV models/pack_efficientnet_model_1.h5",
@@ -73,6 +71,18 @@ def uploadPack():
 
     return jsonify({"class": class_name,
                     "probability": str(prob) + '%'})
+
+@app.route('/extractText', methods=['POST'])
+def extractText():
+    img_string = request.form.get("data")
+    img = base64.b64decode(img_string)
+
+    img = Image.open(BytesIO(img))
+
+    text = extract_text(img)
+    summary = bert_extractive(text, 5)
+
+    return jsonify({"sum_text": summary})
 
 @app.route('/getInfo', methods=['POST'])
 def getInfo():

@@ -4,10 +4,11 @@ import requests
 # from NLP_models.summarizer_nltk import *
 import json
 
-response = requests.get("https://api.fda.gov/drug/label.json?search=description:tylenol&limit=2")
+response = requests.get("https://api.fda.gov/drug/label.json?search=description:tylenol&limit=3")
 json_res = response.json()
 
-# print(json_res["error"])
+print(json_res["results"][2].keys())
+
 
 
 def getDescription(drug_name):
