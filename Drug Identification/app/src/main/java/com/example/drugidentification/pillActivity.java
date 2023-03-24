@@ -52,14 +52,13 @@ import java.util.List;
 import java.util.Map;
 
 public class pillActivity extends AppCompatActivity {
-
     Button select;
     Bitmap bitmap;
     ImageView img;
     Uri selectedImage;
     Uri image_uri;
     final int PERMISSION_CODE = 1000;
-    String rootURL = "https://bd2e-174-93-236-22.ngrok.io";
+    String rootURL = "https://d36a-206-47-149-91.ngrok.io";
     String func ="uploadPill";
     String url = rootURL + "/" + func;
 
@@ -281,8 +280,7 @@ public class pillActivity extends AppCompatActivity {
                     if (result.getResultCode() == Activity.RESULT_OK) {
 
 
-                        Intent i = new Intent(getApplicationContext(), MainActivity.class);
-
+                        Intent i = new Intent(getApplicationContext(), pillActivity.class);
 
                         i.putExtra("image_uri", image_uri);
                         startActivity(i);

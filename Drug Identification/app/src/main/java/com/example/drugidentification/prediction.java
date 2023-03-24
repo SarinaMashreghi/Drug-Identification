@@ -38,6 +38,7 @@ public class prediction extends AppCompatActivity {
         TextView accTxt = findViewById(R.id.acc_txt);
 
         Button infoBtn = findViewById(R.id.info_btn);
+        Button Home = findViewById(R.id.homeBtn);
 
 
         Intent i = getIntent();
@@ -54,6 +55,11 @@ public class prediction extends AppCompatActivity {
         accTxt.setText("Accuracy: "+ prob);
     }
 
+    public void goHome(View v){
+        Intent i = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(i);
+
+    }
     public void getInfo(View v){
 
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
@@ -82,7 +88,7 @@ public class prediction extends AppCompatActivity {
 
                             if(info!=null){
                                 Intent i = new Intent(getApplicationContext(), prediction.class);
-                                Bundle b = new Bundle()
+                                Bundle b = new Bundle();
                                 b.putString("info", "Information about "+prediction+":\n"+info);
                                 i.putExtras(b);
                                 startActivity(i);}
